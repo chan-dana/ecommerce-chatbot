@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home & Kitchen Decor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        .wrapper {
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        main {
+            flex: 1;
+        }
+        footer {
+            background-color: #343a40;
+            color: white;
+            text-align: center;
+            padding: 1rem 0;
+        }
+        .header {
+            background-color: #6c757d;
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+        }
+        .filter-buttons {
+            text-align: center;
+            margin: 2rem 0;
+        }
+        .filter-buttons button {
+            margin: 0.5rem;
+            border-radius: 20px;
+        }
+        .product-card {
+            border: none;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease-in-out;
+            background-color: #fff;
+        }
+        .product-card img {
+            height: 250px;
+            object-fit: cover;
+        }
+        .product-card .card-body {
+            text-align: center;
+        }
+        .product-card:hover {
+            transform: scale(1.05);
+        }
+        .cart-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #000;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .cart-btn:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <header class="header">
+            <h1>Home & Kitchen Decor</h1>
+        </header>
+
+        <main class="container my-5">
+            <!-- Filter Buttons -->
+            <div class="filter-buttons">
+                <button onclick="filterProducts('all')" class="btn btn-outline-dark">All</button>
+                <button onclick="filterProducts('Home-decor')" class="btn btn-outline-dark">Home Decor</button>
+                <button onclick="filterProducts('kitchen')" class="btn btn-outline-dark">Kitchen</button>
+                <button onclick="filterProducts('furniture')" class="btn btn-outline-dark">Furniture</button>
+                <button onclick="filterProducts('lighting')" class="btn btn-outline-dark">Lighting</button>
+            </div>
+
+            <!-- Product List -->
+            <div class="row g-4" id="productList">
+                <!-- Dynamic Product Cards Will Be Rendered Here -->
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2024 Home & Kitchen Decor. All Rights Reserved.</p>
+        </footer>
+
+        <!-- Cart Button -->
+        <button class="cart-btn" id="cartBtn" onclick="redirectToCart()">🛒</button>
+    </div>
+
+    <script>
+        // Cart State
+        let cart = JSON.parse(localStorage.getItem('cartItems')) || [];
+
+        // Sample Products
+        const products = [
+            { id: 1, name: "Flower Vase", price: 25, image: "./Images/Home&kitchen/flower vase.jpeg", category: "Home-decor" },
+            { id: 2, name: "Sofa Set 6-seater", price: 200, image: "./Images/Home&kitchen/sofa.jpeg", category: "furniture" },
+            { id: 3, name: "Chandilier", price: 40, image: "./Images/Home&kitchen/chandilier.jpeg", category: "lighting" },
+            { id: 4, name: "Table Lamp for bed", price: 25, image: "./Images/Home&kitchen/table lamp.jpeg", category: "lighting" },
+            { id: 5, name: "Dinner table 6-set", price: 150, image: "./Images/Home&kitchen/dinner table.jpeg", category: "furniture" },
+            { id: 6, name: "Dinner table 4-set", price: 130, image: "./Images/Home&kitchen/dinner table2.jpeg", category: "furniture" },
+            { id: 7, name: "Plate Stand", price: 15, image: "./Images/Home&kitchen/plate stand.jpeg", category: "kitchen" },
+            { id: 8, name: "Flower Vase", price: 30, image: "./Images/Home&kitchen/flower vase2.jpeg", category: "Home-decor" },
+            { id: 9, name: "Sofa Set 5 seater", price: 220, image: "./Images/Home&kitchen/sofa2.jpeg", category: "furniture" },
+            { id: 10, name: "Knife Stand", price: 20, image: "./Images/Home&kitchen/knife stand.jpeg", category: "kitchen" },
+            { id: 11, name: "Tea Cups", price: 30, image: "./Images/Home&kitchen/tea cups.jpeg", category: "kitchen" },
+            { id: 12, name: "Flower vase", price: 35, image: "./Images/Home&kitchen/vase3.jpeg", category: "Home-decor" },
+            { id: 13, name: "Table Lamp", price: 25, image: "./Images/Home&kitchen/table lamp2.jpeg", category: "lighting" },
+        ];
+
+        // Function to Render Products
+        function renderProducts(filteredProducts) {
+            const productList = document.getElementById('productList');
+            productList.innerHTML = '';
+
+            filteredProducts.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'col-md-4';
+                productCard.innerHTML = `
+                    <div class="product-card">
+                        <img src="${product.image}" alt="${product.name}" class="card-img-top">
+                        <div class="card-body">
+                            <h5 class="card-title">${product.name}</h5>
+                            <p class="price text-success">$${product.price}</p>
+                            <button class="btn btn-primary" onclick="addToCart(${product.id}, '${product.name}', ${product.price}, '${product.image}')">Add to Cart</button>
+                        </div>
+                    </div>
+                `;
+                productList.appendChild(productCard);
+            });
+        }
+
+        // Filter Products
+        function filterProducts(category) {
+            const filteredProducts = category === 'all'
+                ? products
+                : products.filter(product => product.category === category);
+            renderProducts(filteredProducts);
+        }
+
+        // Add Item to Cart
+        function addToCart(id, name, price, image) {
+            const existingItem = cart.find(item => item.id === id);
+            if (existingItem) {
+                existingItem.quantity++;
+            } else {
+                cart.push({ id, name, price, image, quantity: 1 });
+            }
+            localStorage.setItem('cartItems', JSON.stringify(cart));
+            updateCartBtn();
+        }
+
+        // Update Cart Button
+        function updateCartBtn() {
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cartBtn').textContent = `🛒 (${totalItems})`;
+        }
+
+        // Redirect to Cart
+        function redirectToCart() {
+            window.location.href = './cart.html';
+        }
+
+        // Initialize Page
+        function init() {
+            renderProducts(products);
+            updateCartBtn();
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

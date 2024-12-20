@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShopEase - Aesthetic Shopping Experience</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        .wrapper {
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        main {
+            flex: 1; /* Pushes the footer to the bottom */
+        }
+
+        footer {
+            background-color: #f8f9fa; /* Light gray background */
+            color: #555;
+            text-align: center;
+            padding: 1rem 0;
+            bottom: 0;
+            width: 100%;
+            position: fixed;
+            left: 0;
+            bottom: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #e0f7fa, #ffebee); /* Light pastel gradient */
+            color: #333;
+        }
+
+        .navbar {
+            background: linear-gradient(90deg, #397c88, #fac8e1); /* Soft pink gradient */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand, .navbar-nav .nav-link {
+            color: #fff !important;
+            font-weight: 600;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: #ffebee !important;
+        }
+
+        .carousel-inner img {
+            height: 70vh;
+            object-fit: cover;
+            border-radius: 15px;
+        }
+
+        .filters-container {
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .filters-container h3 {
+            font-size: 2.5rem;
+            color: #6c4e99;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .filter-btn {
+            margin: 5px;
+            border: 1px solid #ff66b2;
+            color: #ff66b2;
+            transition: all 0.3s ease-in-out;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 1rem;
+        }
+
+        .filter-btn:hover {
+            background-color: #ff66b2;
+            color: white;
+        }
+
+        .product-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-radius: 15px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .card-img-top {
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+            height: 220px;
+            object-fit: cover;
+        }
+
+        .card-body {
+            padding: 20px;
+            background-color: #fff;
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1b3c49;
+        }
+
+        .card-text {
+            font-size: 0.9rem;
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        .btn-primary {
+            background-color: #607d21;
+            border: none;
+            color: white;
+            border-radius: 20px;
+            padding: 8px 20px;
+            font-size: 1rem;
+        }
+
+        .btn-primary:hover {
+            background-color: #0e1520;
+        }
+
+        .search-bar input {
+            border: 2px solid #ff66b2;
+            border-radius: 30px;
+            padding: 8px 15px;
+            width: 100%;
+            font-size: 1rem;
+        }
+
+        footer a {
+            color: #ff66b2;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Ensuring all cards have equal height */
+        .card {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .card-body {
+            flex-grow: 1;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">ShopEase</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" href="./electrical.html">Electronics</a></li>
+                    <li class="nav-item"><a class="nav-link" href="./clothing.html">Clothing</a></li>
+                    <li class="nav-item"><a class="nav-link" href="./home_kitchen_decor.html">Home & Kitchen</a></li>
+                </ul>
+                <form class="d-flex search-bar" id="searchForm">
+                    <input type="text" id="searchInput" placeholder="Search products...">
+                    <button class="btn" type="submit"><i class="bi bi-search"></i></button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row" id="productList">
+            <div class="col-md-4 mb-4">
+                <div class="card product-card">
+                    <img src="./Images/Sales/electrical appliances.jpeg" class="card-img-top" alt="Appliance">
+                    <div class="card-body">
+                        <h5 class="card-title">Electronic Appliance</h5>
+                        <p class="card-text">Latest gadgets and electronics at the best prices.</p>
+                        <a href="./electrical.html" class="btn btn-primary">Shop Now</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="card product-card">
+                    <img src="./Images/Sales/sofa2.jpeg" class="card-img-top" alt="Appliance">
+                    <div class="card-body">
+                        <h5 class="card-title">Home and Kitchen Decor</h5>
+                        <p class="card-text">Latest Decorative items at the best prices.</p>
+                        <a href="./home_kitchen_decor.html" class="btn btn-primary">Shop Now</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="card product-card">
+                    <img src="./Images/Sales/clothing.jpeg" class="card-img-top" alt="Appliance">
+                    <div class="card-body">
+                        <h5 class="card-title">Clothing Fashion</h5>
+                        <p class="card-text">Latest Collection you like at the best prices.</p>
+                        <a href="./clothing.html" class="btn btn-primary">Shop Now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 ShopEase. All Rights Reserved. | <a href="#">Privacy Policy</a></p>
+    </footer>
+
+    <script>
+        // Product Filtering (Simulated Navigation)
+        function filterCategory(category) {
+            alert('Navigating to: ' + category);
+        }
+
+        // Search Functionality
+    const searchForm = document.getElementById('searchForm');
+
+    searchForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const query = document.getElementById('searchInput').value.toLowerCase();
+
+        // Redirect based on the query
+        if (query.includes('electronic') || query.includes('washing machine') || query.includes('dryer') || query.includes('device') || query.includes('phone')) {
+            // Redirect to electrical.html
+            window.location.href = "http://localhost/ecommerce-chatbot/electrical.html";
+        } else if (query.includes('clothing') || query.includes('women tops') || query.includes('jeans') || query.includes('shoe')) {
+            // Redirect to clothing.html
+            window.location.href = "http://localhost/ecommerce-chatbot/clothing.html";
+        } else if (query.includes('kitchen') || query.includes('home') || query.includes('decorative') || query.includes('sofa')) {
+            // Redirect to home_kitchen_decor.html
+            window.location.href = "http://localhost/ecommerce-chatbot/home_kitchen_decor.html";
+        } else {
+            // Product not found
+            alert('Oops! Product not found.');
+        }
+    });
+
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
