@@ -1,25 +1,42 @@
 from flask import Flask, request, jsonify, render_template
 import mysql.connector
 from mysql.connector import Error
+import re
 
 app = Flask(__name__)
 
-# Function to search the database based on keywords
-def search_products(query):
+# Function to search the database based on keywords, price, and category
+def search_products(query=None, max_price=None, category=None):
     try:
         conn = mysql.connector.connect(
-            host="localhost",      # or use the IP address of the server
-            user="root",           # your MySQL username, usually 'root'
-            password="",           # your MySQL password (if any)
-            database="ecommerce"   # name of your database
+            host="localhost",
+            user="root",
+            password="",  # Replace with your MySQL password
+            database="ecommerce"
         )
         
         if conn.is_connected():
             cursor = conn.cursor()
+            
+            # Build query dynamically based on provided filters
+            conditions = []
+            params = []
 
-            # Search products by name or description
-            cursor.execute("SELECT * FROM products WHERE name LIKE %s OR description LIKE %s", 
-                           (f"%{query}%", f"%{query}%"))
+            if query:
+                conditions.append("(name LIKE %s OR description LIKE %s)")
+                params.extend([f"%{query}%", f"%{query}%"])
+            if max_price is not None:
+                conditions.append("price <= %s")
+                params.append(max_price)
+            if category:
+                conditions.append("category = %s")
+                params.append(category)
+
+            # Combine conditions into a single SQL WHERE clause
+            where_clause = " AND ".join(conditions)
+            sql_query = f"SELECT * FROM products WHERE {where_clause}" if conditions else "SELECT * FROM products"
+
+            cursor.execute(sql_query, tuple(params))
             results = cursor.fetchall()
 
             # Return products as a list of dictionaries
@@ -30,7 +47,7 @@ def search_products(query):
                     "price": row[2],
                     "category": row[3],
                     "description": row[4],
-                    "image_url": row[5]
+                    "image_url": row[5],
                 }
                 for row in results
             ]
@@ -49,28 +66,43 @@ def home():
 @app.route('/chat', methods=['POST'])
 def chatbot():
     user_message = request.json.get('message', '').strip().lower()
-    
+
     if not user_message:
         return jsonify({"reply": "Please enter a valid query."})
     
     # Basic commands
     if user_message in ["hello", "hi", "hey"]:
-        return jsonify({"reply": "Hello! How can I help you today? You can search for products by name or category."})
-    elif user_message in ["help", "how does this work"] :
-        return jsonify({"reply": "You can ask me to search for products by their name or category. For example, try 'Show me electronics' or 'I need a laptop'."})
+        return jsonify({"reply": "Hello! How can I help you today? You can search for products by name, category, or price."})
+    elif user_message in ["help", "how does this work"]:
+        return jsonify({"reply": "You can ask me to search for products by their name, category, or price. For example, 'Show me electronics under 200.00', 'I need a laptop under 500.00', or 'Products under 200.00 in clothing'."})
     
-    # Search for products in the database
-    products = search_products(user_message)
+    # Check if user is asking for products under a specific price and category
+    price_match = re.search(r'under\s*(\d+\.\d{2})', user_message)
+    category_match = re.search(r'in\s*(\w+)', user_message)
+
+    max_price = float(price_match.group(1)) if price_match else None
+    category = category_match.group(1) if category_match else None
+
+    if max_price or category:
+        products = search_products(query=None, max_price=max_price, category=category)
+        if products:
+            reply = f"Here are some products under ${max_price}" + (f" in {category}:" if category else ":") + "<br>"
+            for p in products:
+                reply += f"<strong>{p['name']}</strong> - ${p['price']}<br>{p['description']}<br>"
+            return jsonify({"reply": reply, "products": products})
+        else:
+            reply = f"Sorry, I couldn't find any products under ${max_price}" + (f" in {category}" if category else "") + "."
+            return jsonify({"reply": reply})
+    
+    # Search for products by name or description
+    products = search_products(query=user_message)
     if products:
-        reply = "Here are some products I found:\n"
+        reply = "Here are some products I found:<br>"
         for p in products:
-            reply += f"{p['name']} - ${p['price']} ({p['description']})\nImage: {p['image_url']}\n"
-            # Send the image URL along with the reply for rendering in the chatbot
-            return jsonify({"reply": reply, "image_url": p['image_url']})
+            reply += f"<strong>{p['name']}</strong> - ${p['price']}<br>{p['description']}<br>"
+        return jsonify({"reply": reply, "products": products})
     else:
-        reply = "Sorry, I couldn't find any products matching your query."
-    
-    return jsonify({"reply": reply})
+        return jsonify({"reply": "Sorry, I couldn't find any products matching your query."})
 
 if __name__ == '__main__':
     app.run(debug=True)
